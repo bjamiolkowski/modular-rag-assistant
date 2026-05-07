@@ -104,11 +104,15 @@ def render_header() -> None:
     st.caption("⚡ Powered by Hybrid RAG: semantic search + keyword search + reranking")
 
 
-def render_session_usage() -> None:
+def render_session_usage(cost_box=None, input_box=None, output_box=None) -> None:
     """Render session totals."""
-    st.metric("Total session cost (USD)", f"${st.session_state.total_cost_usd:.6f}")
-    st.metric("Total input tokens", st.session_state.total_input_tokens)
-    st.metric("Total output tokens", st.session_state.total_output_tokens)
+    cost_box = cost_box or st
+    input_box = input_box or st
+    output_box = output_box or st
+
+    cost_box.metric("Total session cost (USD)", f"${st.session_state.total_cost_usd:.6f}")
+    input_box.metric("Total input tokens", st.session_state.total_input_tokens)
+    output_box.metric("Total output tokens", st.session_state.total_output_tokens)
 
 
 def update_session_usage(tokens: dict[str, int] | None, cost_usd: float | None) -> None:
@@ -238,7 +242,15 @@ def render_sidebar() -> dict[str, Any]:
             )
 
         with st.expander("Session usage"):
-            render_session_usage()
+            usage_cost_box = st.empty()
+            usage_input_box = st.empty()
+            usage_output_box = st.empty()
+
+            render_session_usage(
+                usage_cost_box,
+                usage_input_box,
+                usage_output_box,
+            )
             if llm_provider == "openai":
                 st.caption("Using OpenAI API — cost accumulates per query.")
             else:
@@ -260,6 +272,9 @@ def render_sidebar() -> dict[str, Any]:
         "retrieval_mode": retrieval_mode,
         "top_k": top_k,
         "alpha": alpha,
+        "usage_cost_box": usage_cost_box,
+        "usage_input_box": usage_input_box,
+        "usage_output_box": usage_output_box
     }
 
 
@@ -374,6 +389,11 @@ def render_chat_mode(pipeline: ModularRAGPipeline, config: dict[str, Any]) -> No
     latency = output.get("latency", 0.0)
 
     update_session_usage(tokens, cost_usd)
+    render_session_usage(
+        config["usage_cost_box"],
+        config["usage_input_box"],
+        config["usage_output_box"],
+    )
     st.session_state.messages.append({"role": "assistant", "content": answer})
 
     with st.chat_message("assistant"):
@@ -424,6 +444,11 @@ def render_summary_mode(pipeline: ModularRAGPipeline, config: dict[str, Any]) ->
     cost_usd = output.get("cost_usd", 0.0)
 
     update_session_usage(tokens, cost_usd)
+    render_session_usage(
+        config["usage_cost_box"],
+        config["usage_input_box"],
+        config["usage_output_box"],
+    )
 
     st.subheader("Summary")
     st.write(summary)

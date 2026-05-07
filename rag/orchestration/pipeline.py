@@ -10,9 +10,6 @@ Defines the end-to-end pipeline that connects:
 """
 
 from __future__ import annotations
-
-import time
-
 from rag.config import (
     DEFAULT_ALPHA,
     DEFAULT_FAISS_K,
@@ -27,6 +24,8 @@ from rag.post_retrieval.filters import is_context_sufficient, build_grounded_con
 from rag.generation.generator import generate_answer, generate_summary
 from rag.observability.cost import estimate_cost_usd, estimate_tokens
 from rag.observability.logger import log_query
+
+import time
 
 
 FALLBACK_ANSWER = "I could not find the answer in the documents."

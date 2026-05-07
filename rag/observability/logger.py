@@ -15,8 +15,6 @@ LOG_FILE = LOGS_DIR / "queries.log"
 def log_query(data: Dict[str, Any]) -> None:
     """
     Append query log as JSON line.
-
-    Each line = one query (JSONL format).
     """
     data["timestamp"] = time.time()
 
