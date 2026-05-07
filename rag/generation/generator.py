@@ -1,20 +1,15 @@
-"""
-Generation module.
-
-Handles interaction with the configured LLM provider to generate
-answers and summaries from retrieved context.
-"""
-
-from __future__ import annotations
+"""LLM generation helpers."""
 
 import os
-import requests
 
+import requests
 from openai import OpenAI
 
 from rag.config import DEFAULT_PROVIDER, GEN_MODEL, OLLAMA_BASE_URL
 from rag.generation.prompts import answer_prompt, summary_prompt
 
+
+OLLAMA_TIMEOUT = 120
 
 PRICING = {
     "gpt-4.1-mini": {
@@ -29,10 +24,10 @@ PRICING = {
 
 
 def _calculate_cost(model: str, input_tokens: int, output_tokens: int) -> float:
-    if model not in PRICING:
+    """Estimate OpenAI request cost."""
+    pricing = PRICING.get(model)
+    if pricing is None:
         return 0.0
-
-    pricing = PRICING[model]
 
     return (
         input_tokens * pricing["input"]
@@ -41,13 +36,8 @@ def _calculate_cost(model: str, input_tokens: int, output_tokens: int) -> float:
 
 
 def _generate_with_ollama(prompt: str, model: str) -> dict:
-    """
-    Generate text using Ollama HTTP API.
-
-    Uses /api/generate for compatibility with older Ollama versions.
-    """
+    """Generate text with Ollama."""
     url = f"{OLLAMA_BASE_URL}/api/generate"
-
     payload = {
         "model": model,
         "prompt": prompt,
@@ -55,20 +45,21 @@ def _generate_with_ollama(prompt: str, model: str) -> dict:
     }
 
     try:
-        response = requests.post(url, json=payload, timeout=120)
+        response = requests.post(url, json=payload, timeout=OLLAMA_TIMEOUT)
         response.raise_for_status()
-    except requests.RequestException as e:
+    except requests.RequestException as exc:
         raise RuntimeError(
-            f"Failed to connect to Ollama at {OLLAMA_BASE_URL}: {e}"
-        ) from e
+            f"Failed to connect to Ollama at {OLLAMA_BASE_URL}: {exc}"
+        ) from exc
 
     data = response.json()
+    answer = data.get("response")
 
-    if "response" not in data:
+    if answer is None:
         raise RuntimeError(f"Unexpected Ollama response format: {data}")
 
     return {
-        "answer": data["response"].strip(),
+        "answer": answer.strip(),
         "input_tokens": None,
         "output_tokens": None,
         "cost_usd": 0.0,
@@ -76,42 +67,28 @@ def _generate_with_ollama(prompt: str, model: str) -> dict:
 
 
 def _generate_with_openai(prompt: str, model: str) -> dict:
-    """
-    Generate text using OpenAI API.
-    """
+    """Generate text with OpenAI."""
     api_key = os.getenv("OPENAI_API_KEY")
-
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY not set")
 
     client = OpenAI(api_key=api_key)
-
     response = client.chat.completions.create(
         model=model,
-        messages=[
-            {
-                "role": "user",
-                "content": prompt,
-            }
-        ],
+        messages=[{"role": "user", "content": prompt}],
     )
 
     usage = response.usage
+    input_tokens = usage.prompt_tokens if usage else 0
+    output_tokens = usage.completion_tokens if usage else 0
 
-    input_tokens = usage.prompt_tokens
-    output_tokens = usage.completion_tokens
-
-    cost_usd = _calculate_cost(
-        model=model,
-        input_tokens=input_tokens,
-        output_tokens=output_tokens,
-    )
+    message = response.choices[0].message.content or ""
 
     return {
-        "answer": response.choices[0].message.content.strip(),
+        "answer": message.strip(),
         "input_tokens": input_tokens,
         "output_tokens": output_tokens,
-        "cost_usd": cost_usd,
+        "cost_usd": _calculate_cost(model, input_tokens, output_tokens),
     }
 
 
@@ -120,19 +97,14 @@ def _generate(
     model: str = GEN_MODEL,
     provider: str = DEFAULT_PROVIDER,
 ) -> dict:
-    """
-    Route generation to the selected provider.
-    """
+    """Run selected generation backend."""
     if provider == "ollama":
-        return _generate_with_ollama(prompt=prompt, model=model)
+        return _generate_with_ollama(prompt, model)
 
     if provider == "openai":
-        return _generate_with_openai(prompt=prompt, model=model)
+        return _generate_with_openai(prompt, model)
 
-    raise ValueError(
-        f"Unsupported provider='{provider}'. "
-        "Supported providers: ['ollama', 'openai']"
-    )
+    raise ValueError(f"Unsupported provider: {provider}")
 
 
 def generate_answer(
@@ -142,16 +114,9 @@ def generate_answer(
     provider: str = DEFAULT_PROVIDER,
     model: str = GEN_MODEL,
 ) -> dict:
-    """
-    Generate a grounded answer from retrieved context.
-    """
+    """Generate answer from context."""
     prompt = answer_prompt(query, context, history)
-
-    return _generate(
-        prompt=prompt,
-        model=model,
-        provider=provider,
-    )
+    return _generate(prompt, model, provider)
 
 
 def generate_summary(
@@ -160,13 +125,6 @@ def generate_summary(
     provider: str = DEFAULT_PROVIDER,
     model: str = GEN_MODEL,
 ) -> dict:
-    """
-    Generate a summary based on retrieved context.
-    """
+    """Generate summary from context."""
     prompt = summary_prompt(topic, context)
-
-    return _generate(
-        prompt=prompt,
-        model=model,
-        provider=provider,
-    )
+    return _generate(prompt, model, provider)
