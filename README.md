@@ -23,7 +23,7 @@ The architecture is modular and extensible, following patterns used in modern AI
 
 ## Demo
 
-https://github.com/bjam24/modular-rag-assistant/blob/main/assets/demo.mp4
+<video src="https://github.com/bjam24/modular-rag-assistant/blob/main/assets/demo.mp4" width="320" height="240" controls></video>
 
 ### Main application view
 
