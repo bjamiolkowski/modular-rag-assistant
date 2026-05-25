@@ -5,10 +5,8 @@ Loads the FAISS index and chunk metadata used during retrieval.
 """
 
 import pickle
-from pathlib import Path
-
 import faiss
-
+from pathlib import Path
 from rag.config import INDEX_PATH, CHUNKS_PATH
 
 

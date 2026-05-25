@@ -28,7 +28,6 @@ def load_pdf(file_path: Path) -> str:
     reader = PdfReader(str(file_path))
     pages = []
 
-    # --- normal extraction ---
     for page in reader.pages:
         text = page.extract_text() or ""
         if text.strip():
@@ -36,11 +35,9 @@ def load_pdf(file_path: Path) -> str:
 
     text_content = "\n\n".join(pages).strip()
 
-    # jeśli mamy tekst → zwracamy
     if text_content:
         return text_content
 
-    # --- OCR fallback ---
     print(f"[OCR] Falling back to OCR for: {file_path.name}")
 
     images = convert_from_path(str(file_path), dpi=300)

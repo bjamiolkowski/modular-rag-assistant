@@ -20,6 +20,7 @@ RETRIEVAL_MODES = ["dense", "sparse", "hybrid"]
 
 
 def reciprocal_rank(retrieved_sources: list[str], expected_sources: list[str]) -> float:
+    """Compute Reciprocal Rank for retrieved sources."""
     for rank, source in enumerate(retrieved_sources, start=1):
         if source in expected_sources:
             return 1.0 / rank
@@ -27,6 +28,7 @@ def reciprocal_rank(retrieved_sources: list[str], expected_sources: list[str]) -
 
 
 def recall_at_k(retrieved_sources: list[str], expected_sources: list[str], k: int) -> float:
+    """Measures how many expected sources are retrieved within the top K results."""
     expected_set = set(expected_sources)
 
     if not expected_set:
@@ -45,6 +47,7 @@ def evaluate(
     alpha: float = 0.6,
     retrieval_mode: str = "hybrid",
 ) -> dict:
+    """ Evaluate retrieval quality for a set of predefined test queries."""
     if not test_queries:
         raise ValueError("No test queries provided.")
 
@@ -124,6 +127,7 @@ def evaluate(
 
 
 def build_pipeline() -> ModularRAGPipeline:
+    """Build RAG pipeline."""
     index = load_index()
     chunks = load_chunks()
     vectorizer, tfidf_matrix = build_tfidf_index(chunks)
@@ -137,6 +141,7 @@ def build_pipeline() -> ModularRAGPipeline:
 
 
 def summarize_metrics(metrics: dict) -> dict:
+    """Create a compact summary of retrieval evaluation metrics."""
     return {
         "mode": metrics["retrieval_mode"],
         "top1_accuracy": round(metrics["top1_accuracy"], 4),
@@ -155,6 +160,7 @@ def compare_retrieval_modes(
     tfidf_k: int = 20,
     alpha: float = 0.6,
 ) -> list[dict]:
+    """Compare retrieval performance across different retrieval modes."""
     pipeline = build_pipeline()
     comparison = []
 

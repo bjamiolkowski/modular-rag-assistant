@@ -20,7 +20,6 @@ The architecture is modular and extensible, following patterns used in modern AI
 
 ---
 
-
 ## Demo
 
 ### Main application view

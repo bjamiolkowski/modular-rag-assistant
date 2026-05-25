@@ -4,9 +4,6 @@ Data models for the Modular RAG system.
 This module defines structured representations for:
 - document chunks
 - retrieval results
-
-Using dataclasses improves code readability, type safety,
-and consistency across the pipeline.
 """
 
 
