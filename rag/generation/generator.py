@@ -2,14 +2,14 @@
 
 import os
 
-import requests
-from openai import OpenAI
+from langchain_core.output_parsers import StrOutputParser
+from langchain_ollama import ChatOllama
+from langchain_openai import ChatOpenAI
 
+from rag.chains.qa_chain import build_qa_chain
+from rag.chains.summary_chain import build_summary_chain
 from rag.config import DEFAULT_PROVIDER, GEN_MODEL, OLLAMA_BASE_URL
-from rag.generation.prompts import answer_prompt, summary_prompt
 
-
-OLLAMA_TIMEOUT = 120
 
 PRICING = {
     "gpt-4.1-mini": {
@@ -35,76 +35,62 @@ def _calculate_cost(model: str, input_tokens: int, output_tokens: int) -> float:
     )
 
 
-def _generate_with_ollama(prompt: str, model: str) -> dict:
-    """Generate text with Ollama."""
-    url = f"{OLLAMA_BASE_URL}/api/generate"
-    payload = {
-        "model": model,
-        "prompt": prompt,
-        "stream": False,
-    }
-
-    try:
-        response = requests.post(url, json=payload, timeout=OLLAMA_TIMEOUT)
-        response.raise_for_status()
-    except requests.RequestException as exc:
-        raise RuntimeError(
-            f"Failed to connect to Ollama at {OLLAMA_BASE_URL}: {exc}"
-        ) from exc
-
-    data = response.json()
-    answer = data.get("response")
-
-    if answer is None:
-        raise RuntimeError(f"Unexpected Ollama response format: {data}")
-
-    return {
-        "answer": answer.strip(),
-        "input_tokens": None,
-        "output_tokens": None,
-        "cost_usd": 0.0,
-    }
-
-
-def _generate_with_openai(prompt: str, model: str) -> dict:
-    """Generate text with OpenAI."""
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise RuntimeError("OPENAI_API_KEY not set")
-
-    client = OpenAI(api_key=api_key)
-    response = client.chat.completions.create(
-        model=model,
-        messages=[{"role": "user", "content": prompt}],
-    )
-
-    usage = response.usage
-    input_tokens = usage.prompt_tokens if usage else 0
-    output_tokens = usage.completion_tokens if usage else 0
-
-    message = response.choices[0].message.content or ""
-
-    return {
-        "answer": message.strip(),
-        "input_tokens": input_tokens,
-        "output_tokens": output_tokens,
-        "cost_usd": _calculate_cost(model, input_tokens, output_tokens),
-    }
-
-
-def _generate(
-    prompt: str,
-    model: str = GEN_MODEL,
-    provider: str = DEFAULT_PROVIDER,
-) -> dict:
-    """Run selected generation backend."""
+def _get_llm(provider: str, model: str):
+    """Create LangChain chat model for the selected provider."""
     if provider == "ollama":
-        return _generate_with_ollama(prompt, model)
+        return ChatOllama(
+            model=model,
+            base_url=OLLAMA_BASE_URL,
+            temperature=0,
+        )
 
     if provider == "openai":
-        return _generate_with_openai(prompt, model)
+        if not os.getenv("OPENAI_API_KEY"):
+            raise RuntimeError("OPENAI_API_KEY not set")
+
+        return ChatOpenAI(
+            model=model,
+            temperature=0,
+        )
 
     raise ValueError(f"Unsupported provider: {provider}")
+
+
+def _extract_usage(response) -> tuple[int, int]:
+    """Extract token usage from LangChain chat model response."""
+    usage = getattr(response, "usage_metadata", None)
+
+    if not usage:
+        return 0, 0
+
+    input_tokens = usage.get("input_tokens", 0)
+    output_tokens = usage.get("output_tokens", 0)
+
+    return input_tokens, output_tokens
+
+
+def _run_generation_chain(
+    chain,
+    values: dict,
+    model: str,
+    provider: str,
+) -> dict:
+    """Run a LangChain generation chain and return UI-compatible metadata."""
+    response = chain.invoke(values)
+
+    input_tokens, output_tokens = _extract_usage(response)
+    answer = StrOutputParser().invoke(response).strip()
+
+    return {
+        "answer": answer,
+        "input_tokens": input_tokens if provider == "openai" else None,
+        "output_tokens": output_tokens if provider == "openai" else None,
+        "cost_usd": (
+            _calculate_cost(model, input_tokens, output_tokens)
+            if provider == "openai"
+            else 0.0
+        ),
+    }
 
 
 def generate_answer(
@@ -114,9 +100,20 @@ def generate_answer(
     provider: str = DEFAULT_PROVIDER,
     model: str = GEN_MODEL,
 ) -> dict:
-    """Generate answer from context."""
-    prompt = answer_prompt(query, context, history)
-    return _generate(prompt, model, provider)
+    """Generate answer from retrieved context."""
+    llm = _get_llm(provider, model)
+    chain = build_qa_chain(llm)
+
+    return _run_generation_chain(
+        chain,
+        {
+            "query": query,
+            "context": context,
+            "history": history,
+        },
+        model,
+        provider,
+    )
 
 
 def generate_summary(
@@ -125,6 +122,16 @@ def generate_summary(
     provider: str = DEFAULT_PROVIDER,
     model: str = GEN_MODEL,
 ) -> dict:
-    """Generate summary from context."""
-    prompt = summary_prompt(topic, context)
-    return _generate(prompt, model, provider)
+    """Generate summary from retrieved context."""
+    llm = _get_llm(provider, model)
+    chain = build_summary_chain(llm)
+
+    return _run_generation_chain(
+        chain,
+        {
+            "topic": topic,
+            "context": context,
+        },
+        model,
+        provider,
+    )
