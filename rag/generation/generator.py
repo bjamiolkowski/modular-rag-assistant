@@ -135,3 +135,24 @@ def generate_summary(
         model,
         provider,
     )
+
+
+def stream_answer(
+    query: str,
+    context: str,
+    history: str,
+    provider: str = DEFAULT_PROVIDER,
+    model: str = GEN_MODEL,
+):
+    """Stream answer tokens from retrieved context."""
+    llm = _get_llm(provider, model)
+    chain = build_qa_chain(llm)
+
+    for chunk in chain.stream(
+        {
+            "query": query,
+            "context": context,
+            "history": history,
+        }
+    ):
+        yield StrOutputParser().invoke(chunk)

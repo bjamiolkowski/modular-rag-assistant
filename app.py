@@ -357,51 +357,60 @@ def render_chat_mode(pipeline: ModularRAGPipeline, config: dict[str, Any]) -> No
 
     history = build_history(st.session_state.messages[:-1])
 
-    with st.spinner("Searching documents and generating answer..."):
-        try:
-            output = pipeline.run_chat(
-                query=query,
-                history=history,
-                top_k=config["top_k"],
-                faiss_k=DEFAULT_FAISS_K,
-                tfidf_k=DEFAULT_TFIDF_K,
-                alpha=config["alpha"],
-                retrieval_mode=config["retrieval_mode"],
-                generation_mode=config["generation_mode"],
-                llm_provider=config["llm_provider"],
-                llm_model=config["llm_model"],
-            )
-        except Exception as exc:
-            output = {
-                "answer": f"An error occurred: {exc}",
-                "results": [],
-                "corrected_query": None,
-                "latency": 0.0,
-                "tokens": {"input": 0, "output": 0},
-                "cost_usd": 0.0,
-            }
-
-    answer = output.get("answer", "")
-    corrected_query = output.get("corrected_query")
-    results = output.get("results", [])
-    tokens = output.get("tokens", {})
-    cost_usd = output.get("cost_usd", 0.0)
-    latency = output.get("latency", 0.0)
-
-    update_session_usage(tokens, cost_usd)
-    render_session_usage(
-        config["usage_cost_box"],
-        config["usage_input_box"],
-        config["usage_output_box"],
-    )
-    st.session_state.messages.append({"role": "assistant", "content": answer})
-
     with st.chat_message("assistant"):
-        if corrected_query and corrected_query.casefold() != query.casefold():
-            st.caption(f"Did you mean: {corrected_query}?")
+        try:
+            with st.spinner("Searching documents..."):
+                output = pipeline.run_chat_stream(
+                    query=query,
+                    history=history,
+                    top_k=config["top_k"],
+                    faiss_k=DEFAULT_FAISS_K,
+                    tfidf_k=DEFAULT_TFIDF_K,
+                    alpha=config["alpha"],
+                    retrieval_mode=config["retrieval_mode"],
+                    generation_mode=config["generation_mode"],
+                    llm_provider=config["llm_provider"],
+                    llm_model=config["llm_model"],
+                )
 
-        st.write(answer)
-        render_request_usage(tokens, cost_usd, config, latency=latency)
+            corrected_query = output.get("corrected_query")
+            results = output.get("results", [])
+            tokens = output.get("tokens", {})
+            cost_usd = output.get("cost_usd") or 0.0
+            latency = output.get("latency", 0.0)
+
+            if corrected_query and corrected_query.casefold() != query.casefold():
+                st.caption(f"Did you mean: {corrected_query[0].upper() + corrected_query[1:]}")
+
+            answer = st.write_stream(output["answer_stream"])
+
+            output_tokens = tokens.get("output")
+            if output_tokens is None:
+                from rag.observability.cost import estimate_tokens
+
+                output_tokens = estimate_tokens(answer)
+                tokens["output"] = output_tokens
+
+            update_session_usage(tokens, cost_usd)
+            render_session_usage(
+                config["usage_cost_box"],
+                config["usage_input_box"],
+                config["usage_output_box"],
+            )
+
+            st.session_state.messages.append(
+                {"role": "assistant", "content": answer}
+            )
+
+            render_request_usage(tokens, cost_usd, config, latency=latency)
+
+        except Exception as exc:
+            answer = f"An error occurred: {exc}"
+            st.write(answer)
+            results = []
+            st.session_state.messages.append(
+                {"role": "assistant", "content": answer}
+            )
 
     render_sources(results)
 

@@ -1,15 +1,11 @@
 """
 Core orchestration module for the Modular RAG system.
-
-Defines the end-to-end pipeline that connects:
-- query transformation
-- hybrid retrieval (FAISS + TF-IDF)
-- reranking and filtering
-- grounded generation
-- cost and latency tracking
 """
 
 from __future__ import annotations
+
+import time
+
 from rag.config import (
     DEFAULT_ALPHA,
     DEFAULT_FAISS_K,
@@ -17,15 +13,16 @@ from rag.config import (
     DEFAULT_TOP_K,
     GENERATION_MODES,
 )
-from rag.pre_retrieval.query_transform import rewrite_query, build_vocabulary
-from rag.retrieval.hybrid import retrieve_chunks
-from rag.post_retrieval.reranker import rerank_results
-from rag.post_retrieval.filters import is_context_sufficient, build_grounded_context
-from rag.generation.generator import generate_answer, generate_summary
+from rag.generation.generator import generate_answer, generate_summary, stream_answer
 from rag.observability.cost import estimate_cost_usd, estimate_tokens
 from rag.observability.logger import log_query
-
-import time
+from rag.post_retrieval.filters import (
+    build_grounded_context,
+    is_context_sufficient,
+)
+from rag.post_retrieval.reranker import rerank_results
+from rag.pre_retrieval.query_transform import build_vocabulary, rewrite_query
+from rag.retrieval.hybrid import retrieve_chunks
 
 
 FALLBACK_ANSWER = "I could not find the answer in the documents."
@@ -33,14 +30,9 @@ FALLBACK_SUMMARY = "I could not find enough information in the documents."
 
 
 class ModularRAGPipeline:
-    """
-    End-to-end Retrieval-Augmented Generation pipeline.
-    """
+    """End-to-end Retrieval-Augmented Generation pipeline."""
 
     def __init__(self, index, chunks: list[dict], vectorizer, tfidf_matrix) -> None:
-        """
-        Initialize the pipeline with retrieval resources.
-        """
         self.index = index
         self.chunks = chunks
         self.vectorizer = vectorizer
@@ -48,18 +40,23 @@ class ModularRAGPipeline:
         self.vocab = build_vocabulary(chunks)
 
     def _rewrite_query(self, query: str) -> tuple[str, str | None]:
-        """
-        Rewrite query and return the corrected version if it changed.
-        """
         original_query, rewritten_query = rewrite_query(query, self.vocab)
-        corrected_query = rewritten_query if rewritten_query != original_query else None
+
+        def normalize(text: str) -> str:
+            return (
+                text.casefold()
+                .strip()
+                .rstrip("?.!")
+            )
+
+        if normalize(rewritten_query) != normalize(original_query):
+            corrected_query = rewritten_query
+        else:
+            corrected_query = None
 
         return rewritten_query, corrected_query
 
     def _get_generation_settings(self, generation_mode: str) -> dict:
-        """
-        Return generation settings for selected cost-aware mode.
-        """
         if generation_mode not in GENERATION_MODES:
             raise ValueError(
                 f"Unknown generation_mode='{generation_mode}'. "
@@ -67,6 +64,16 @@ class ModularRAGPipeline:
             )
 
         return GENERATION_MODES[generation_mode]
+
+    def _build_sources(self, results: list[dict]) -> list[dict]:
+        return [
+            {
+                "source": result.get("source"),
+                "score": result.get("score"),
+                "text": result.get("text"),
+            }
+            for result in results
+        ]
 
     def retrieve(
         self,
@@ -77,9 +84,7 @@ class ModularRAGPipeline:
         alpha: float = DEFAULT_ALPHA,
         retrieval_mode: str = "hybrid",
     ) -> list[dict]:
-        """
-        Retrieve and rerank relevant document chunks using selected retrieval mode.
-        """
+        """Retrieve and rerank relevant document chunks."""
         rewritten_query, _ = self._rewrite_query(query)
 
         retrieved = retrieve_chunks(
@@ -96,7 +101,6 @@ class ModularRAGPipeline:
         )
 
         reranked = rerank_results(retrieved, rewritten_query)
-
         return reranked[:top_k]
 
     def run_chat(
@@ -112,13 +116,10 @@ class ModularRAGPipeline:
         llm_provider: str = "ollama",
         llm_model: str = "llama3",
     ) -> dict:
-        """
-        Run the RAG pipeline for question answering.
-        """
+        """Run the RAG pipeline for question answering."""
         start_time = time.time()
 
         generation_settings = self._get_generation_settings(generation_mode)
-
         selected_top_k = top_k or generation_settings["top_k"]
         max_context_chars = generation_settings["max_context_chars"]
 
@@ -164,10 +165,7 @@ class ModularRAGPipeline:
                 "llm_provider": llm_provider,
                 "llm_model": llm_model,
                 "latency": latency_sec,
-                "tokens": {
-                    "input": 0,
-                    "output": 0,
-                },
+                "tokens": {"input": 0, "output": 0},
                 "cost_usd": 0.0,
             }
 
@@ -184,7 +182,6 @@ class ModularRAGPipeline:
 
         if isinstance(generation_output, dict):
             answer = generation_output.get("answer", "")
-
             input_tokens = generation_output.get("input_tokens")
             output_tokens = generation_output.get("output_tokens")
             cost_usd = generation_output.get("cost_usd")
@@ -213,15 +210,7 @@ class ModularRAGPipeline:
                 )
 
         latency_sec = round(time.time() - start_time, 3)
-
-        sources = [
-            {
-                "source": result.get("source"),
-                "score": result.get("score"),
-                "text": result.get("text"),
-            }
-            for result in results
-        ]
+        sources = self._build_sources(results)
 
         log_query(
             {
@@ -251,11 +240,128 @@ class ModularRAGPipeline:
             "llm_provider": llm_provider,
             "llm_model": llm_model,
             "latency": latency_sec,
-            "tokens": {
-                "input": input_tokens,
-                "output": output_tokens,
-            },
+            "tokens": {"input": input_tokens, "output": output_tokens},
             "cost_usd": cost_usd,
+        }
+
+    def run_chat_stream(
+        self,
+        query: str,
+        history: list,
+        top_k: int = 5,
+        faiss_k: int = 20,
+        tfidf_k: int = 20,
+        alpha: float = 0.6,
+        retrieval_mode: str = "hybrid",
+        generation_mode: str = "balanced",
+        llm_provider: str = "ollama",
+        llm_model: str = "llama3",
+    ) -> dict:
+        """Run the RAG pipeline and stream the generated answer."""
+        start_time = time.time()
+
+        generation_settings = self._get_generation_settings(generation_mode)
+        selected_top_k = top_k or generation_settings["top_k"]
+        max_context_chars = generation_settings["max_context_chars"]
+
+        rewritten_query, corrected_query = self._rewrite_query(query)
+
+        results = self.retrieve(
+            query=rewritten_query,
+            top_k=selected_top_k,
+            faiss_k=faiss_k,
+            tfidf_k=tfidf_k,
+            alpha=alpha,
+            retrieval_mode=retrieval_mode,
+        )
+
+        if not results:
+            latency_sec = round(time.time() - start_time, 3)
+
+            def fallback_stream():
+                yield FALLBACK_ANSWER
+
+            return {
+                "answer_stream": fallback_stream(),
+                "results": [],
+                "sources": [],
+                "corrected_query": corrected_query,
+                "rewritten_query": rewritten_query,
+                "retrieval_mode": retrieval_mode,
+                "generation_mode": generation_mode,
+                "llm_provider": llm_provider,
+                "llm_model": llm_model,
+                "latency": latency_sec,
+                "tokens": {"input": 0, "output": 0},
+                "cost_usd": 0.0,
+            }
+
+        context = build_grounded_context(results)
+        context = context[:max_context_chars]
+
+        input_tokens = estimate_tokens(
+            rewritten_query + "\n" + context + "\n" + str(history or "")
+        )
+
+        def answer_stream():
+            full_answer = ""
+
+            for token in stream_answer(
+                query=rewritten_query,
+                context=context,
+                history=history,
+                provider=llm_provider,
+                model=llm_model,
+            ):
+                full_answer += token
+                yield token
+
+            output_tokens = estimate_tokens(full_answer)
+            latency_sec = round(time.time() - start_time, 3)
+
+            cost_usd = (
+                0.0
+                if llm_provider == "ollama"
+                else estimate_cost_usd(
+                    model=llm_model,
+                    input_tokens=input_tokens,
+                    output_tokens=output_tokens,
+                )
+            )
+
+            log_query(
+                {
+                    "query": query,
+                    "retrieval_mode": retrieval_mode,
+                    "generation_mode": generation_mode,
+                    "llm_provider": llm_provider,
+                    "model": llm_model,
+                    "top_k": selected_top_k,
+                    "input_tokens": input_tokens,
+                    "output_tokens": output_tokens,
+                    "cost_usd": cost_usd,
+                    "latency_sec": latency_sec,
+                    "num_sources": len(results),
+                    "fallback": False,
+                }
+            )
+
+        latency_sec = round(time.time() - start_time, 3)
+        sources = self._build_sources(results)
+
+        return {
+            "answer_stream": answer_stream(),
+            "results": results,
+            "sources": sources,
+            "corrected_query": corrected_query,
+            "rewritten_query": rewritten_query,
+            "retrieval_mode": retrieval_mode,
+            "generation_mode": generation_mode,
+            "llm_provider": llm_provider,
+            "llm_model": llm_model,
+            "latency": latency_sec,
+            "tokens": {"input": input_tokens, "output": None},
+            "cost_usd": None,
         }
 
     def run_summary(
@@ -269,9 +375,7 @@ class ModularRAGPipeline:
         llm_provider: str = "ollama",
         llm_model: str = "llama3",
     ) -> dict:
-        """
-        Run the RAG pipeline for topic summarization.
-        """
+        """Run the RAG pipeline for topic summarization."""
         start_time = time.time()
 
         results = self.retrieve(
@@ -293,10 +397,7 @@ class ModularRAGPipeline:
                 "llm_provider": llm_provider,
                 "llm_model": llm_model,
                 "latency": latency_sec,
-                "tokens": {
-                    "input": 0,
-                    "output": 0,
-                },
+                "tokens": {"input": 0, "output": 0},
                 "cost_usd": 0.0,
             }
 
@@ -310,10 +411,7 @@ class ModularRAGPipeline:
                 "llm_provider": llm_provider,
                 "llm_model": llm_model,
                 "latency": latency_sec,
-                "tokens": {
-                    "input": 0,
-                    "output": 0,
-                },
+                "tokens": {"input": 0, "output": 0},
                 "cost_usd": 0.0,
             }
 
@@ -328,7 +426,6 @@ class ModularRAGPipeline:
 
         if isinstance(generation_output, dict):
             summary = generation_output.get("summary") or generation_output.get("answer", "")
-
             input_tokens = generation_output.get("input_tokens")
             output_tokens = generation_output.get("output_tokens")
             cost_usd = generation_output.get("cost_usd")
@@ -380,9 +477,6 @@ class ModularRAGPipeline:
             "llm_provider": llm_provider,
             "llm_model": llm_model,
             "latency": latency_sec,
-            "tokens": {
-                "input": input_tokens,
-                "output": output_tokens,
-            },
+            "tokens": {"input": input_tokens, "output": output_tokens},
             "cost_usd": cost_usd,
         }

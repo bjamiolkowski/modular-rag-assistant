@@ -18,8 +18,11 @@ ANSWER_PROMPT = ChatPromptTemplate.from_messages(
             - Treat retrieved chunks as the only source of information.
             - Some retrieved chunks may be unrelated. Ignore content that does not help answer the question.
             - Do not add facts that are not supported by the provided context.
-            - If the context does not contain enough information, say that the answer was not found in the documents.
+            - Never answer using your general knowledge.
+            - Never explain topics that are not present in the retrieved context.
+            - If the context does not contain the answer, respond exactly: "The answer was not found in the provided documents."
             - Keep the answer concise and focused.
+            - Do not include document names, source metadata, chunk IDs, or citations in the final answer.
             """.strip(),
         ),
         (
