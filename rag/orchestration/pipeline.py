@@ -43,11 +43,7 @@ class ModularRAGPipeline:
         original_query, rewritten_query = rewrite_query(query, self.vocab)
 
         def normalize(text: str) -> str:
-            return (
-                text.casefold()
-                .strip()
-                .rstrip("?.!")
-            )
+            return text.casefold().strip().rstrip("?.!")
 
         if normalize(rewritten_query) != normalize(original_query):
             corrected_query = rewritten_query
@@ -199,15 +195,14 @@ class ModularRAGPipeline:
         if output_tokens is None:
             output_tokens = estimate_tokens(answer)
 
-        if cost_usd is None:
-            if llm_provider == "ollama":
-                cost_usd = 0.0
-            else:
-                cost_usd = estimate_cost_usd(
-                    model=llm_model,
-                    input_tokens=input_tokens,
-                    output_tokens=output_tokens,
-                )
+        if llm_provider == "ollama":
+            cost_usd = 0.0
+        else:
+            cost_usd = estimate_cost_usd(
+                model=llm_model,
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+            )
 
         latency_sec = round(time.time() - start_time, 3)
         sources = self._build_sources(results)
@@ -266,6 +261,9 @@ class ModularRAGPipeline:
 
         rewritten_query, corrected_query = self._rewrite_query(query)
 
+        if corrected_query is None and rewritten_query.casefold() != query.casefold():
+            corrected_query = rewritten_query
+
         results = self.retrieve(
             query=rewritten_query,
             top_k=selected_top_k,
@@ -280,6 +278,23 @@ class ModularRAGPipeline:
 
             def fallback_stream():
                 yield FALLBACK_ANSWER
+
+            log_query(
+                {
+                    "query": query,
+                    "retrieval_mode": retrieval_mode,
+                    "generation_mode": generation_mode,
+                    "llm_provider": llm_provider,
+                    "model": llm_model,
+                    "top_k": selected_top_k,
+                    "input_tokens": 0,
+                    "output_tokens": 0,
+                    "cost_usd": 0.0,
+                    "latency_sec": latency_sec,
+                    "num_sources": 0,
+                    "fallback": True,
+                }
+            )
 
             return {
                 "answer_stream": fallback_stream(),
@@ -303,9 +318,14 @@ class ModularRAGPipeline:
             rewritten_query + "\n" + context + "\n" + str(history or "")
         )
 
-        def answer_stream():
-            full_answer = ""
+        stream_state = {
+            "full_answer": "",
+            "output_tokens": 0,
+            "cost_usd": 0.0,
+            "latency_sec": 0.0,
+        }
 
+        def answer_stream():
             for token in stream_answer(
                 query=rewritten_query,
                 context=context,
@@ -313,21 +333,23 @@ class ModularRAGPipeline:
                 provider=llm_provider,
                 model=llm_model,
             ):
-                full_answer += token
+                stream_state["full_answer"] += token
                 yield token
 
-            output_tokens = estimate_tokens(full_answer)
-            latency_sec = round(time.time() - start_time, 3)
+            stream_state["output_tokens"] = estimate_tokens(
+                stream_state["full_answer"]
+            )
 
-            cost_usd = (
-                0.0
-                if llm_provider == "ollama"
-                else estimate_cost_usd(
+            if llm_provider == "ollama":
+                stream_state["cost_usd"] = 0.0
+            else:
+                stream_state["cost_usd"] = estimate_cost_usd(
                     model=llm_model,
                     input_tokens=input_tokens,
-                    output_tokens=output_tokens,
+                    output_tokens=stream_state["output_tokens"],
                 )
-            )
+
+            stream_state["latency_sec"] = round(time.time() - start_time, 3)
 
             log_query(
                 {
@@ -338,9 +360,9 @@ class ModularRAGPipeline:
                     "model": llm_model,
                     "top_k": selected_top_k,
                     "input_tokens": input_tokens,
-                    "output_tokens": output_tokens,
-                    "cost_usd": cost_usd,
-                    "latency_sec": latency_sec,
+                    "output_tokens": stream_state["output_tokens"],
+                    "cost_usd": stream_state["cost_usd"],
+                    "latency_sec": stream_state["latency_sec"],
                     "num_sources": len(results),
                     "fallback": False,
                 }
@@ -390,6 +412,23 @@ class ModularRAGPipeline:
         if not results:
             latency_sec = round(time.time() - start_time, 3)
 
+            log_query(
+                {
+                    "query": topic,
+                    "retrieval_mode": retrieval_mode,
+                    "generation_mode": "summary",
+                    "llm_provider": llm_provider,
+                    "model": llm_model,
+                    "top_k": top_k,
+                    "input_tokens": 0,
+                    "output_tokens": 0,
+                    "cost_usd": 0.0,
+                    "latency_sec": latency_sec,
+                    "num_sources": 0,
+                    "fallback": True,
+                }
+            )
+
             return {
                 "summary": FALLBACK_SUMMARY,
                 "results": [],
@@ -403,6 +442,23 @@ class ModularRAGPipeline:
 
         if not is_context_sufficient(results):
             latency_sec = round(time.time() - start_time, 3)
+
+            log_query(
+                {
+                    "query": topic,
+                    "retrieval_mode": retrieval_mode,
+                    "generation_mode": "summary",
+                    "llm_provider": llm_provider,
+                    "model": llm_model,
+                    "top_k": top_k,
+                    "input_tokens": 0,
+                    "output_tokens": 0,
+                    "cost_usd": 0.0,
+                    "latency_sec": latency_sec,
+                    "num_sources": len(results),
+                    "fallback": True,
+                }
+            )
 
             return {
                 "summary": FALLBACK_SUMMARY,
@@ -425,7 +481,9 @@ class ModularRAGPipeline:
         )
 
         if isinstance(generation_output, dict):
-            summary = generation_output.get("summary") or generation_output.get("answer", "")
+            summary = generation_output.get("summary") or generation_output.get(
+                "answer", ""
+            )
             input_tokens = generation_output.get("input_tokens")
             output_tokens = generation_output.get("output_tokens")
             cost_usd = generation_output.get("cost_usd")
@@ -441,15 +499,14 @@ class ModularRAGPipeline:
         if output_tokens is None:
             output_tokens = estimate_tokens(summary)
 
-        if cost_usd is None:
-            if llm_provider == "ollama":
-                cost_usd = 0.0
-            else:
-                cost_usd = estimate_cost_usd(
-                    model=llm_model,
-                    input_tokens=input_tokens,
-                    output_tokens=output_tokens,
-                )
+        if llm_provider == "ollama":
+            cost_usd = 0.0
+        else:
+            cost_usd = estimate_cost_usd(
+                model=llm_model,
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+            )
 
         latency_sec = round(time.time() - start_time, 3)
 

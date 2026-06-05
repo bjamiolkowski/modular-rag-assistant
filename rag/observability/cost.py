@@ -6,15 +6,18 @@ def estimate_cost_usd(
     input_tokens: int,
     output_tokens: int,
 ) -> float:
-    """Estimate API cost."""
+    """Estimate cost in USD."""
     pricing = MODEL_PRICING_USD_PER_1M_TOKENS.get(model)
+
     if pricing is None:
         return 0.0
 
     input_cost = (input_tokens / 1_000_000) * pricing["input"]
     output_cost = (output_tokens / 1_000_000) * pricing["output"]
 
-    return round(input_cost + output_cost, 6)
+    cost = input_cost + output_cost
+
+    return round(cost, 6)
 
 
 def estimate_tokens(text: str) -> int:

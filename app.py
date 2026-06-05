@@ -1,17 +1,19 @@
 """Streamlit UI for the Modular RAG Assistant."""
 
 from __future__ import annotations
+
 from pathlib import Path
 from typing import Any
+
+import faiss
+import streamlit as st
+
 from rag.config import DATA_DIR
 from rag.indexing.builder import rebuild_knowledge_base
 from rag.orchestration.pipeline import ModularRAGPipeline
 from rag.retrieval.sparse import build_tfidf_index
 from rag.utils.history import build_history
 from rag.utils.io import load_chunks, load_index
-
-import faiss
-import streamlit as st
 
 
 QUALITY_MODE_MAP = {
@@ -46,24 +48,266 @@ def cached_build_tfidf_index(chunks: list[dict[str, Any]]) -> tuple[Any, Any]:
 
 
 def setup_page() -> None:
-    """Set page config and sidebar styles."""
+    """Set page config and custom UI styles."""
     st.set_page_config(page_title="Modular RAG Assistant", layout="wide")
 
     st.markdown(
         """
         <style>
-        section[data-testid="stSidebar"] h1,
-        section[data-testid="stSidebar"] h2,
-        section[data-testid="stSidebar"] h3 {
-            font-size: 1.35rem !important;
-            font-weight: 800 !important;
+        .stApp {
+            background:
+                radial-gradient(circle at 18% 80%, rgba(0, 150, 170, 0.62), transparent 34%),
+                radial-gradient(circle at 62% 56%, rgba(58, 54, 92, 0.72), transparent 42%),
+                radial-gradient(circle at 86% 18%, rgba(210, 105, 35, 0.72), transparent 36%),
+                radial-gradient(circle at 82% 78%, rgba(132, 38, 84, 0.60), transparent 38%),
+                linear-gradient(135deg, #06111d 0%, #102333 32%, #21152a 62%, #30151f 100%);
+            background-attachment: fixed;
+        }
+
+        [data-testid="stHeader"],
+        [data-testid="stBottom"],
+        [data-testid="stBottom"] > div,
+        [data-testid="stBottomBlockContainer"],
+        [data-testid="stChatInputContainer"],
+        [data-testid="stChatInputContainer"] > div {
+            background: transparent !important;
+        }
+
+        .stApp,
+        .stMarkdown,
+        p,
+        span,
+        label,
+        div {
+            color: rgba(255, 255, 255, 0.92);
+        }
+
+        h1, h2, h3 {
+            color: rgba(255, 255, 255, 0.96) !important;
+        }
+
+        [data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #050b14 0%, #08131f 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .sidebar-section-title {
-            font-size: 1.35rem;
-            font-weight: 800;
+            font-size: 1.6rem !important;
+            font-weight: 800 !important;
+            letter-spacing: 0.2px;
             margin-top: 1.25rem;
             margin-bottom: 0.75rem;
+            color: rgba(255, 255, 255, 0.96) !important;
+        }
+
+        [data-testid="stChatMessage"] {
+            background: rgba(10, 18, 32, 0.32) !important;
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 14px;
+            padding: 14px;
+        }
+
+        [data-testid="stExpander"] {
+            background: rgba(10, 18, 32, 0.30) !important;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.20) !important;
+            border-radius: 14px !important;
+        }
+
+        [data-testid="stExpander"] summary {
+            color: rgba(255, 255, 255, 0.95) !important;
+        }
+
+        [data-testid="stPopover"] button {
+            background: rgba(255, 255, 255, 0.10) !important;
+            color: rgba(255, 255, 255, 0.95) !important;
+            border: 1px solid rgba(255, 255, 255, 0.22) !important;
+            border-radius: 10px !important;
+            box-shadow: none !important;
+        }
+
+        [data-testid="stPopover"] button:hover {
+            background: rgba(255, 255, 255, 0.16) !important;
+            border-color: rgba(255, 255, 255, 0.32) !important;
+        }
+
+        div[data-baseweb="popover"] > div {
+            background: rgba(10, 18, 32, 0.94) !important;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+            border-radius: 14px !important;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35) !important;
+        }
+
+        div[data-baseweb="popover"] * {
+            color: rgba(255, 255, 255, 0.92) !important;
+        }
+
+        [data-testid="stChatInput"] {
+            background: rgba(10, 18, 32, 0.34) !important;
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 14px;
+        }
+
+        [data-testid="stChatInput"] textarea {
+            color: white !important;
+            background: transparent !important;
+        }
+
+        [data-testid="stChatInput"] textarea::placeholder {
+            color: rgba(255, 255, 255, 0.55) !important;
+        }
+
+        [data-baseweb="select"] > div {
+            background: rgba(255, 255, 255, 0.08) !important;
+            color: white !important;
+            border-radius: 10px;
+        }
+
+        .stButton button {
+            background: rgba(255, 255, 255, 0.08) !important;
+            backdrop-filter: blur(15px);
+            color: white !important;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+        }
+
+        .stButton button:hover {
+            background: rgba(255, 255, 255, 0.14) !important;
+            border-color: rgba(255, 255, 255, 0.28);
+        }
+
+        .stTextInput input {
+            background: rgba(255, 255, 255, 0.10) !important;
+            color: white !important;
+            border-radius: 10px;
+        }
+
+        .stTextInput input::placeholder {
+            color: rgba(255, 255, 255, 0.55) !important;
+        }
+
+        .kb-card {
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 14px;
+            background: rgba(10, 18, 32, 0.44);
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .kb-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 10px;
+        }
+
+        .kb-dropbox {
+            border: 1px dashed rgba(56, 189, 248, 0.35);
+            border-radius: 14px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(18, 24, 34, 0.75),
+                    rgba(10, 15, 24, 0.85)
+                );
+
+            text-align: center;
+            padding: 18px 10px 74px 10px;
+            min-height: 170px;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .kb-icon {
+            width: 44px;
+            height: 44px;
+
+            border-radius: 50%;
+            margin-bottom: 10px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: rgba(248,113,113,0.12);
+            border: 1px solid rgba(248,113,113,0.20);
+
+            color: #f87171;
+            font-size: 21px;
+        }
+
+        .kb-main {
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.92);
+            line-height: 1.35;
+        }
+
+        .kb-main span {
+            color: #f87171;
+        }
+
+        .kb-sub {
+            margin-top: 5px;
+            color: rgba(255, 255, 255, 0.60);
+            font-size: 11px;
+        }
+
+        [data-testid="stFileUploader"] {
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            margin-top: -82px;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 10;
+        }
+
+        [data-testid="stFileUploader"] section {
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+        }
+
+        [data-testid="stFileUploader"] section > div {
+            display: none !important;
+        }
+
+
+        [data-testid="stFileUploader"] button {
+
+            width: 72% !important;
+            margin-left: 14% !important;
+
+            background: rgba(15,23,42,0.75) !important;
+
+            color: white !important;
+
+            border:
+                1px solid rgba(56,189,248,0.25)
+                !important;
+
+                border-radius: 10px !important;
+                height: 40px !important;
+        }
+
+        [data-testid="stFileUploader"] button:hover {
+            background: rgba(255, 255, 255, 0.14) !important;
+            border-color: rgba(248, 113, 113, 0.55) !important;
+        }
+
+        .kb-saved-file {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.66);
+            margin-top: -4px;
+            margin-bottom: 10px;
         }
         </style>
         """,
@@ -101,7 +345,6 @@ def render_header() -> None:
         "Ask questions about your documents using a modular RAG pipeline with "
         "hybrid retrieval, reranking, and transparent usage metrics."
     )
-    st.caption("⚡ Powered by Hybrid RAG: semantic search + keyword search + reranking")
 
 
 def render_session_usage(cost_box=None, input_box=None, output_box=None) -> None:
@@ -151,7 +394,33 @@ def load_pipeline() -> ModularRAGPipeline | None:
 
 def save_uploaded_file() -> None:
     """Save uploaded file."""
-    uploaded_file = st.file_uploader("Upload a .txt or .pdf file", type=["txt", "pdf"])
+    st.markdown(
+"""
+<div class="kb-card">
+<div class="kb-title">Knowledge base</div>
+
+<div class="kb-dropbox">
+<div class="kb-icon">📄</div>
+
+<div class="kb-main">
+Upload your <span>PDF, TXT</span> here
+</div>
+
+<div class="kb-sub">
+Limit 200MB per file
+</div>
+</div>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
+
+    uploaded_file = st.file_uploader(
+        label="Upload documents",
+        type=["txt", "pdf"],
+        label_visibility="collapsed",
+    )
+
     if uploaded_file is None:
         return
 
@@ -160,7 +429,15 @@ def save_uploaded_file() -> None:
 
     file_path = data_dir / uploaded_file.name
     file_path.write_bytes(uploaded_file.getbuffer())
-    st.success(f"Saved file: {uploaded_file.name}")
+
+    st.markdown(
+        f"""
+<div class="kb-saved-file">
+Saved file: {uploaded_file.name}
+</div>
+""",
+        unsafe_allow_html=True,
+    )
 
 
 def handle_rebuild() -> None:
@@ -251,6 +528,7 @@ def render_sidebar() -> dict[str, Any]:
                 usage_input_box,
                 usage_output_box,
             )
+
             if llm_provider == "openai":
                 st.caption("Using OpenAI API — cost accumulates per query.")
             else:
@@ -274,65 +552,84 @@ def render_sidebar() -> dict[str, Any]:
         "alpha": alpha,
         "usage_cost_box": usage_cost_box,
         "usage_input_box": usage_input_box,
-        "usage_output_box": usage_output_box
+        "usage_output_box": usage_output_box,
     }
 
 
 def render_request_usage(
     tokens: dict[str, int] | None,
     cost_usd: float,
-    config: dict[str, Any],
-    latency: float | None = None,
+    latency: float,
+    results: list[dict[str, Any]] | None = None,
 ) -> None:
-    """Render usage for one request."""
+    """Render usage metrics and source overview."""
     tokens = tokens or {}
+    results = results or []
 
-    with st.expander("Usage details"):
-        if latency is None:
-            col1, col2 = st.columns(2)
-        else:
-            col0, col1, col2 = st.columns(3)
-            with col0:
-                st.metric("Latency", f"{latency:.2f}s")
+    with st.expander("**Usage details**"):
+        latency_col, tokens_col, cost_col = st.columns(3)
 
-        with col1:
-            st.metric("Estimated cost", f"${cost_usd:.6f}")
+        with latency_col:
+            st.caption("Latency")
+            st.markdown(f"**{latency:.2f}s**")
 
-        with col2:
-            st.metric(
-                "Tokens",
-                f"{tokens.get('input', 0)} in / {tokens.get('output', 0)} out",
+        with tokens_col:
+            st.caption("Tokens")
+            st.markdown(
+                f"**{tokens.get('input', 0)} in / {tokens.get('output', 0)} out**"
             )
 
-        details = [
-            f"Provider: {config['llm_provider']}",
-            f"Model: {config['llm_model']}",
-        ]
+        with cost_col:
+            st.caption("Cost")
+            st.markdown(f"**${cost_usd:.6f}**")
 
-        if config.get("quality_label"):
-            details.append(f"Quality mode: {config['quality_label']}")
+        if not results:
+            return
 
-        details.append(f"Retrieval mode: {config['retrieval_mode']}")
-        st.caption(" | ".join(details))
+        grouped_sources: dict[str, list[dict[str, Any]]] = {}
 
+        for result in results:
+            source_name = result.get("source", "unknown source")
+            grouped_sources.setdefault(source_name, []).append(result)
 
-def render_sources(results: list[dict[str, Any]]) -> None:
-    """Render source chunks."""
-    if not results:
-        return
+        st.markdown("")
+        st.caption(f"Sources used ({len(grouped_sources)} documents)")
 
-    st.subheader("Sources")
+        for source_name, source_chunks in grouped_sources.items():
+            chunk_count = len(source_chunks)
+            chunk_label = "chunk" if chunk_count == 1 else "chunks"
 
-    for result in results:
-        label = (
-            f"{result.get('rank', '?')} | {result.get('source', 'unknown source')} "
-            f"| hybrid: {result.get('hybrid_score', 0.0):.3f} "
-            f"| vec: {result.get('vector_score', 0.0):.3f} "
-            f"| tfidf: {result.get('tfidf_score', 0.0):.3f}"
-        )
+            source_col, chunks_col, details_col = st.columns([5, 2, 2])
 
-        with st.expander(label):
-            st.write(result.get("text", ""))
+            with source_col:
+                st.write(source_name)
+
+            with chunks_col:
+                st.caption(f"{chunk_count} {chunk_label} used")
+
+            with details_col:
+                with st.popover("Show details"):
+                    for chunk_index, chunk in enumerate(source_chunks, start=1):
+                        st.caption(
+                            (
+                                f"Chunk {chunk_index} · "
+                                f"hybrid {chunk.get('hybrid_score', 0.0):.3f} · "
+                                f"vec {chunk.get('vector_score', 0.0):.3f} · "
+                                f"tfidf {chunk.get('tfidf_score', 0.0):.3f}"
+                            )
+                        )
+
+                        chunk_text = chunk.get("text", "")
+                        preview = (
+                            chunk_text[:700] + "..."
+                            if len(chunk_text) > 700
+                            else chunk_text
+                        )
+
+                        st.write(preview)
+
+                        if chunk_index < chunk_count:
+                            st.divider()
 
 
 def render_chat_history() -> None:
@@ -375,21 +672,29 @@ def render_chat_mode(pipeline: ModularRAGPipeline, config: dict[str, Any]) -> No
 
             corrected_query = output.get("corrected_query")
             results = output.get("results", [])
-            tokens = output.get("tokens", {})
-            cost_usd = output.get("cost_usd") or 0.0
+            tokens = output.get("tokens", {}) or {}
             latency = output.get("latency", 0.0)
 
             if corrected_query and corrected_query.casefold() != query.casefold():
-                st.caption(f"Did you mean: {corrected_query[0].upper() + corrected_query[1:]}")
+                st.caption(
+                    f"Did you mean: {corrected_query[0].upper() + corrected_query[1:]}"
+                )
 
             answer = st.write_stream(output["answer_stream"])
 
-            output_tokens = tokens.get("output")
-            if output_tokens is None:
-                from rag.observability.cost import estimate_tokens
+            from rag.observability.cost import estimate_cost_usd, estimate_tokens
 
-                output_tokens = estimate_tokens(answer)
-                tokens["output"] = output_tokens
+            output_tokens = estimate_tokens(answer)
+            tokens["output"] = output_tokens
+
+            if config["llm_provider"] == "ollama":
+                cost_usd = 0.0
+            else:
+                cost_usd = estimate_cost_usd(
+                    model=config["llm_model"],
+                    input_tokens=tokens.get("input", 0),
+                    output_tokens=output_tokens,
+                )
 
             update_session_usage(tokens, cost_usd)
             render_session_usage(
@@ -402,17 +707,19 @@ def render_chat_mode(pipeline: ModularRAGPipeline, config: dict[str, Any]) -> No
                 {"role": "assistant", "content": answer}
             )
 
-            render_request_usage(tokens, cost_usd, config, latency=latency)
+            render_request_usage(
+                tokens=tokens,
+                cost_usd=cost_usd,
+                latency=latency,
+                results=results,
+            )
 
         except Exception as exc:
             answer = f"An error occurred: {exc}"
             st.write(answer)
-            results = []
             st.session_state.messages.append(
                 {"role": "assistant", "content": answer}
             )
-
-    render_sources(results)
 
 
 def render_summary_mode(pipeline: ModularRAGPipeline, config: dict[str, Any]) -> None:
@@ -445,12 +752,14 @@ def render_summary_mode(pipeline: ModularRAGPipeline, config: dict[str, Any]) ->
                 "results": [],
                 "tokens": {"input": 0, "output": 0},
                 "cost_usd": 0.0,
+                "latency": 0.0,
             }
 
     summary = output.get("summary", "")
     results = output.get("results", [])
     tokens = output.get("tokens", {})
     cost_usd = output.get("cost_usd", 0.0)
+    latency = output.get("latency", 0.0)
 
     update_session_usage(tokens, cost_usd)
     render_session_usage(
@@ -461,8 +770,13 @@ def render_summary_mode(pipeline: ModularRAGPipeline, config: dict[str, Any]) ->
 
     st.subheader("Summary")
     st.write(summary)
-    render_request_usage(tokens, cost_usd, config)
-    render_sources(results)
+
+    render_request_usage(
+        tokens=tokens,
+        cost_usd=cost_usd,
+        latency=latency,
+        results=results,
+    )
 
 
 def main() -> None:
