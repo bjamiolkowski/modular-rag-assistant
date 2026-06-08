@@ -1,0 +1,1372 @@
+[
+  {
+    "experiment": "dense_top5",
+    "query": "What is currency trading?",
+    "expected_sources": [
+      "Currency Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Day Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 1.6591
+  },
+  {
+    "experiment": "dense_top5",
+    "query": "What are major currency pairs?",
+    "expected_sources": [
+      "Currency Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.1025
+  },
+  {
+    "experiment": "dense_top5",
+    "query": "What is day trading?",
+    "expected_sources": [
+      "Day Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0608
+  },
+  {
+    "experiment": "dense_top5",
+    "query": "What are the risks of day trading?",
+    "expected_sources": [
+      "Day Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0658
+  },
+  {
+    "experiment": "dense_top5",
+    "query": "What is fundamental analysis?",
+    "expected_sources": [
+      "Fundamental Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0613
+  },
+  {
+    "experiment": "dense_top5",
+    "query": "How do financial statements help investors?",
+    "expected_sources": [
+      "Fundamental Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Swing Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0532
+  },
+  {
+    "experiment": "dense_top5",
+    "query": "What is swing trading?",
+    "expected_sources": [
+      "Swing Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0595
+  },
+  {
+    "experiment": "dense_top5",
+    "query": "How does swing trading differ from day trading?",
+    "expected_sources": [
+      "Swing Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Day Trading.pdf",
+      "Swing Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0521
+  },
+  {
+    "experiment": "dense_top5",
+    "query": "What is technical analysis?",
+    "expected_sources": [
+      "Technical Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Swing Trading.pdf",
+      "Currency Trading.pdf",
+      "Technical Analysis.pdf"
+    ],
+    "top1_hit": false,
+    "top3_hit": false,
+    "top5_hit": true,
+    "reciprocal_rank": 0.2,
+    "recall_at_1": 0.0,
+    "recall_at_3": 0.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0489
+  },
+  {
+    "experiment": "dense_top5",
+    "query": "What are chart patterns used for?",
+    "expected_sources": [
+      "Technical Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Technical Analysis.pdf",
+      "Technical Analysis.pdf",
+      "Swing Trading.pdf",
+      "Currency Trading.pdf",
+      "Swing Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0578
+  },
+  {
+    "experiment": "sparse_top5",
+    "query": "What is currency trading?",
+    "expected_sources": [
+      "Currency Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0295
+  },
+  {
+    "experiment": "sparse_top5",
+    "query": "What are major currency pairs?",
+    "expected_sources": [
+      "Currency Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0335
+  },
+  {
+    "experiment": "sparse_top5",
+    "query": "What is day trading?",
+    "expected_sources": [
+      "Day Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Swing Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0326
+  },
+  {
+    "experiment": "sparse_top5",
+    "query": "What are the risks of day trading?",
+    "expected_sources": [
+      "Day Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.038
+  },
+  {
+    "experiment": "sparse_top5",
+    "query": "What is fundamental analysis?",
+    "expected_sources": [
+      "Fundamental Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0317
+  },
+  {
+    "experiment": "sparse_top5",
+    "query": "How do financial statements help investors?",
+    "expected_sources": [
+      "Fundamental Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Swing Trading.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0363
+  },
+  {
+    "experiment": "sparse_top5",
+    "query": "What is swing trading?",
+    "expected_sources": [
+      "Swing Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0203
+  },
+  {
+    "experiment": "sparse_top5",
+    "query": "How does swing trading differ from day trading?",
+    "expected_sources": [
+      "Swing Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Day Trading.pdf",
+      "Swing Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0402
+  },
+  {
+    "experiment": "sparse_top5",
+    "query": "What is technical analysis?",
+    "expected_sources": [
+      "Technical Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Fundamental Analysis.pdf",
+      "Currency Trading.pdf",
+      "Technical Analysis.pdf"
+    ],
+    "top1_hit": false,
+    "top3_hit": false,
+    "top5_hit": true,
+    "reciprocal_rank": 0.2,
+    "recall_at_1": 0.0,
+    "recall_at_3": 0.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0212
+  },
+  {
+    "experiment": "sparse_top5",
+    "query": "What are chart patterns used for?",
+    "expected_sources": [
+      "Technical Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Technical Analysis.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf"
+    ],
+    "top1_hit": false,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 0.3333333333333333,
+    "recall_at_1": 0.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0184
+  },
+  {
+    "experiment": "hybrid_a03_top5",
+    "query": "What is currency trading?",
+    "expected_sources": [
+      "Currency Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Technical Analysis.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0916
+  },
+  {
+    "experiment": "hybrid_a03_top5",
+    "query": "What are major currency pairs?",
+    "expected_sources": [
+      "Currency Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0818
+  },
+  {
+    "experiment": "hybrid_a03_top5",
+    "query": "What is day trading?",
+    "expected_sources": [
+      "Day Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0902
+  },
+  {
+    "experiment": "hybrid_a03_top5",
+    "query": "What are the risks of day trading?",
+    "expected_sources": [
+      "Day Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0772
+  },
+  {
+    "experiment": "hybrid_a03_top5",
+    "query": "What is fundamental analysis?",
+    "expected_sources": [
+      "Fundamental Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0941
+  },
+  {
+    "experiment": "hybrid_a03_top5",
+    "query": "How do financial statements help investors?",
+    "expected_sources": [
+      "Fundamental Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Swing Trading.pdf"
+    ],
+    "top1_hit": false,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 0.3333333333333333,
+    "recall_at_1": 0.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0938
+  },
+  {
+    "experiment": "hybrid_a03_top5",
+    "query": "What is swing trading?",
+    "expected_sources": [
+      "Swing Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.085
+  },
+  {
+    "experiment": "hybrid_a03_top5",
+    "query": "How does swing trading differ from day trading?",
+    "expected_sources": [
+      "Swing Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Swing Trading.pdf",
+      "Day Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0897
+  },
+  {
+    "experiment": "hybrid_a03_top5",
+    "query": "What is technical analysis?",
+    "expected_sources": [
+      "Technical Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Currency Trading.pdf",
+      "Technical Analysis.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Fundamental Analysis.pdf"
+    ],
+    "top1_hit": false,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 0.5,
+    "recall_at_1": 0.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.094
+  },
+  {
+    "experiment": "hybrid_a03_top5",
+    "query": "What are chart patterns used for?",
+    "expected_sources": [
+      "Technical Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Technical Analysis.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.1015
+  },
+  {
+    "experiment": "hybrid_a06_top5",
+    "query": "What is currency trading?",
+    "expected_sources": [
+      "Currency Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Currency Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.1159
+  },
+  {
+    "experiment": "hybrid_a06_top5",
+    "query": "What are major currency pairs?",
+    "expected_sources": [
+      "Currency Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.101
+  },
+  {
+    "experiment": "hybrid_a06_top5",
+    "query": "What is day trading?",
+    "expected_sources": [
+      "Day Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0688
+  },
+  {
+    "experiment": "hybrid_a06_top5",
+    "query": "What are the risks of day trading?",
+    "expected_sources": [
+      "Day Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.1152
+  },
+  {
+    "experiment": "hybrid_a06_top5",
+    "query": "What is fundamental analysis?",
+    "expected_sources": [
+      "Fundamental Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0979
+  },
+  {
+    "experiment": "hybrid_a06_top5",
+    "query": "How do financial statements help investors?",
+    "expected_sources": [
+      "Fundamental Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Fundamental Analysis.pdf",
+      "Swing Trading.pdf",
+      "Fundamental Analysis.pdf",
+      "Swing Trading.pdf",
+      "Fundamental Analysis.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.1042
+  },
+  {
+    "experiment": "hybrid_a06_top5",
+    "query": "What is swing trading?",
+    "expected_sources": [
+      "Swing Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.1197
+  },
+  {
+    "experiment": "hybrid_a06_top5",
+    "query": "How does swing trading differ from day trading?",
+    "expected_sources": [
+      "Swing Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Day Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.1107
+  },
+  {
+    "experiment": "hybrid_a06_top5",
+    "query": "What is technical analysis?",
+    "expected_sources": [
+      "Technical Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Currency Trading.pdf",
+      "Technical Analysis.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Swing Trading.pdf"
+    ],
+    "top1_hit": false,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 0.5,
+    "recall_at_1": 0.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.111
+  },
+  {
+    "experiment": "hybrid_a06_top5",
+    "query": "What are chart patterns used for?",
+    "expected_sources": [
+      "Technical Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Technical Analysis.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Technical Analysis.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.1106
+  },
+  {
+    "experiment": "hybrid_a08_top5",
+    "query": "What is currency trading?",
+    "expected_sources": [
+      "Currency Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Currency Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.1105
+  },
+  {
+    "experiment": "hybrid_a08_top5",
+    "query": "What are major currency pairs?",
+    "expected_sources": [
+      "Currency Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.1161
+  },
+  {
+    "experiment": "hybrid_a08_top5",
+    "query": "What is day trading?",
+    "expected_sources": [
+      "Day Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.1094
+  },
+  {
+    "experiment": "hybrid_a08_top5",
+    "query": "What are the risks of day trading?",
+    "expected_sources": [
+      "Day Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0975
+  },
+  {
+    "experiment": "hybrid_a08_top5",
+    "query": "What is fundamental analysis?",
+    "expected_sources": [
+      "Fundamental Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0763
+  },
+  {
+    "experiment": "hybrid_a08_top5",
+    "query": "How do financial statements help investors?",
+    "expected_sources": [
+      "Fundamental Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.101
+  },
+  {
+    "experiment": "hybrid_a08_top5",
+    "query": "What is swing trading?",
+    "expected_sources": [
+      "Swing Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0845
+  },
+  {
+    "experiment": "hybrid_a08_top5",
+    "query": "How does swing trading differ from day trading?",
+    "expected_sources": [
+      "Swing Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Day Trading.pdf",
+      "Swing Trading.pdf",
+      "Day Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.1036
+  },
+  {
+    "experiment": "hybrid_a08_top5",
+    "query": "What is technical analysis?",
+    "expected_sources": [
+      "Technical Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Technical Analysis.pdf",
+      "Currency Trading.pdf",
+      "Swing Trading.pdf"
+    ],
+    "top1_hit": false,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 0.3333333333333333,
+    "recall_at_1": 0.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0976
+  },
+  {
+    "experiment": "hybrid_a08_top5",
+    "query": "What are chart patterns used for?",
+    "expected_sources": [
+      "Technical Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Technical Analysis.pdf",
+      "Swing Trading.pdf",
+      "Technical Analysis.pdf",
+      "Swing Trading.pdf",
+      "Technical Analysis.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0891
+  },
+  {
+    "experiment": "hybrid_a06_top10",
+    "query": "What is currency trading?",
+    "expected_sources": [
+      "Currency Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Currency Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0734
+  },
+  {
+    "experiment": "hybrid_a06_top10",
+    "query": "What are major currency pairs?",
+    "expected_sources": [
+      "Currency Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0902
+  },
+  {
+    "experiment": "hybrid_a06_top10",
+    "query": "What is day trading?",
+    "expected_sources": [
+      "Day Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0651
+  },
+  {
+    "experiment": "hybrid_a06_top10",
+    "query": "What are the risks of day trading?",
+    "expected_sources": [
+      "Day Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0941
+  },
+  {
+    "experiment": "hybrid_a06_top10",
+    "query": "What is fundamental analysis?",
+    "expected_sources": [
+      "Fundamental Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0947
+  },
+  {
+    "experiment": "hybrid_a06_top10",
+    "query": "How do financial statements help investors?",
+    "expected_sources": [
+      "Fundamental Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Swing Trading.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Swing Trading.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Swing Trading.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf",
+      "Fundamental Analysis.pdf"
+    ],
+    "top1_hit": false,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 0.5,
+    "recall_at_1": 0.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.1032
+  },
+  {
+    "experiment": "hybrid_a06_top10",
+    "query": "What is swing trading?",
+    "expected_sources": [
+      "Swing Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0909
+  },
+  {
+    "experiment": "hybrid_a06_top10",
+    "query": "How does swing trading differ from day trading?",
+    "expected_sources": [
+      "Swing Trading.pdf"
+    ],
+    "retrieved_sources": [
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Day Trading.pdf",
+      "Swing Trading.pdf",
+      "Day Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0923
+  },
+  {
+    "experiment": "hybrid_a06_top10",
+    "query": "What is technical analysis?",
+    "expected_sources": [
+      "Technical Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Currency Trading.pdf",
+      "Technical Analysis.pdf",
+      "Currency Trading.pdf",
+      "Currency Trading.pdf",
+      "Swing Trading.pdf",
+      "Technical Analysis.pdf",
+      "Currency Trading.pdf",
+      "Technical Analysis.pdf",
+      "Currency Trading.pdf",
+      "Technical Analysis.pdf"
+    ],
+    "top1_hit": false,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 0.5,
+    "recall_at_1": 0.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0882
+  },
+  {
+    "experiment": "hybrid_a06_top10",
+    "query": "What are chart patterns used for?",
+    "expected_sources": [
+      "Technical Analysis.pdf"
+    ],
+    "retrieved_sources": [
+      "Technical Analysis.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Swing Trading.pdf",
+      "Technical Analysis.pdf",
+      "Technical Analysis.pdf",
+      "Swing Trading.pdf",
+      "Day Trading.pdf",
+      "Swing Trading.pdf",
+      "Currency Trading.pdf"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true,
+    "reciprocal_rank": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "latency_sec": 0.0896
+  }
+]

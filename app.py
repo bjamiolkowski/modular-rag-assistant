@@ -340,12 +340,12 @@ def render_section_title(title: str) -> None:
 
 def render_header() -> None:
     """Render app header."""
-    st.title("Modular RAG Assistant")
+    st.title("𓅃 Parrotly")
     st.markdown(
-        "Ask questions about your documents using a modular RAG pipeline with "
-        "hybrid retrieval, reranking, and transparent usage metrics."
+        "**Personal Knowledge Assistant** powered by Retrieval-Augmented Generation.\n\n"
+        "Upload your documents, build your private knowledge base, "
+        "and get AI answers grounded in your own content."
     )
-
 
 def render_session_usage(cost_box=None, input_box=None, output_box=None) -> None:
     """Render session totals."""

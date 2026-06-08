@@ -1,44 +1,23 @@
 """
-Embedding module.
-
-Generates normalized embeddings using a local model (Ollama)
-for both indexing and query-time retrieval.
+Generates normalized embeddings. The default provider uses local Ollama embeddings.
 """
 
 from __future__ import annotations
 
 import faiss
 import numpy as np
-import requests
+
+from langchain_ollama import OllamaEmbeddings
 
 from rag.config import EMBED_MODEL, OLLAMA_BASE_URL
 
 
-def _embed_with_ollama(text: str) -> list[float]:
-    """
-    Generate embedding using Ollama HTTP API.
-    """
-    url = f"{OLLAMA_BASE_URL}/api/embeddings"
-
-    payload = {
-        "model": EMBED_MODEL,
-        "prompt": text,
-    }
-
-    try:
-        response = requests.post(url, json=payload, timeout=60)
-        response.raise_for_status()
-    except requests.RequestException as e:
-        raise RuntimeError(
-            f"Failed to connect to Ollama embeddings at {OLLAMA_BASE_URL}: {e}"
-        ) from e
-
-    data = response.json()
-
-    if "embedding" not in data:
-        raise RuntimeError(f"Unexpected Ollama embedding response format: {data}")
-
-    return data["embedding"]
+def _get_embedding_model() -> OllamaEmbeddings:
+    """Create the LangChain Ollama embedding model."""
+    return OllamaEmbeddings(
+        model=EMBED_MODEL,
+        base_url=OLLAMA_BASE_URL,
+    )
 
 
 def embed_text(text: str) -> np.ndarray:
@@ -48,7 +27,8 @@ def embed_text(text: str) -> np.ndarray:
     if not text.strip():
         return np.zeros((1, 1), dtype="float32")
 
-    vector = _embed_with_ollama(text)
+    embedding_model = _get_embedding_model()
+    vector = embedding_model.embed_query(text)
 
     vec = np.array([vector], dtype="float32")
     faiss.normalize_L2(vec)
@@ -60,19 +40,17 @@ def build_embeddings(chunks: list[dict]) -> np.ndarray:
     """
     Generate normalized embeddings for document chunks.
     """
-    vectors = []
+    texts = [
+        chunk.get("text", "").strip()
+        for chunk in chunks
+        if chunk.get("text", "").strip()
+    ]
 
-    for chunk in chunks:
-        text = chunk.get("text", "").strip()
-
-        if not text:
-            continue
-
-        vector = _embed_with_ollama(text)
-        vectors.append(vector)
-
-    if not vectors:
+    if not texts:
         return np.empty((0, 0), dtype="float32")
+
+    embedding_model = _get_embedding_model()
+    vectors = embedding_model.embed_documents(texts)
 
     embeddings = np.array(vectors, dtype="float32")
     faiss.normalize_L2(embeddings)

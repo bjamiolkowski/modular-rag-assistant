@@ -1,61 +1,47 @@
 """
-Document loading module.
-
-Loads supported files from disk and converts them into
-a unified format for indexing.
+Loads supported files from disk using and converts them into a unified format for indexing.
 """
 
 from pathlib import Path
-from pypdf import PdfReader
-import pytesseract
-from pdf2image import convert_from_path
+
+from langchain_community.document_loaders import PyPDFLoader, TextLoader
 
 
-def load_txt(file_path: Path) -> str:
-    """
-    Load text content from a .txt file.
-    """
-    return file_path.read_text(encoding="utf-8").strip()
+def load_txt(file_path: Path) -> list[dict]:
+    """Load text content from a TXT file."""
+    loader = TextLoader(str(file_path), encoding="utf-8")
+    documents = loader.load()
+
+    return [
+        {
+            "source": file_path.name,
+            "text": document.page_content.strip(),
+            "metadata": document.metadata,
+        }
+        for document in documents
+        if document.page_content.strip()
+    ]
 
 
-def load_pdf(file_path: Path) -> str:
-    """
-    Extract text from PDF.
+def load_pdf(file_path: Path) -> list[dict]:
+    """Load text content from a PDF file."""
+    loader = PyPDFLoader(str(file_path))
+    documents = loader.load()
 
-    First tries standard extraction.
-    Falls back to OCR if no text is found (scanned PDFs).
-    """
-    reader = PdfReader(str(file_path))
-    pages = []
-
-    for page in reader.pages:
-        text = page.extract_text() or ""
-        if text.strip():
-            pages.append(text.strip())
-
-    text_content = "\n\n".join(pages).strip()
-
-    if text_content:
-        return text_content
-
-    print(f"[OCR] Falling back to OCR for: {file_path.name}")
-
-    images = convert_from_path(str(file_path), dpi=300)
-
-    ocr_pages = []
-    for i, img in enumerate(images, start=1):
-        ocr_text = pytesseract.image_to_string(img)
-        if ocr_text.strip():
-            ocr_pages.append(f"\n\n--- Page {i} ---\n{ocr_text.strip()}")
-
-    return "\n\n".join(ocr_pages).strip()
+    return [
+        {
+            "source": file_path.name,
+            "text": document.page_content.strip(),
+            "metadata": document.metadata,
+        }
+        for document in documents
+        if document.page_content.strip()
+    ]
 
 
 def load_documents(data_dir: Path) -> list[dict]:
-    """
-    Load all supported documents from a directory.
-    """
-    documents = []
+    """Load all supported documents from a directory."""
+    loaded_documents = []
 
     for file_path in sorted(data_dir.iterdir()):
         if not file_path.is_file():
@@ -64,18 +50,12 @@ def load_documents(data_dir: Path) -> list[dict]:
         suffix = file_path.suffix.lower()
 
         if suffix == ".txt":
-            text = load_txt(file_path)
+            documents = load_txt(file_path)
         elif suffix == ".pdf":
-            text = load_pdf(file_path)
+            documents = load_pdf(file_path)
         else:
             continue
 
-        if not text:
-            continue
+        loaded_documents.extend(documents)
 
-        documents.append({
-            "source": file_path.name,
-            "text": text,
-        })
-
-    return documents
+    return loaded_documents

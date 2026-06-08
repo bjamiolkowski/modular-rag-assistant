@@ -1,22 +1,26 @@
-# Modular RAG Assistant
+# 𓅃 Parrotly
 
-A modular Retrieval-Augmented Generation (RAG) system designed to reflect real-world production pipelines.  
-The project combines hybrid retrieval, reranking, and LLM-based generation with full transparency of token usage and cost.
+**Personal Knowledge Assistant powered by Retrieval-Augmented Generation (RAG).**
+
+Parrotly is a modular AI application that allows users to build a private knowledge base from their own documents and interact with it using natural language.
+
+The project focuses on transparent and experiment-driven RAG development:
+document processing, hybrid retrieval, reranking, local/cloud LLM support and retrieval evaluation.
 
 ---
 
 ## Overview
 
-This system allows users to:
+Parrotly allows users to:
 
-- Query their own documents using natural language  
-- Generate answers grounded in retrieved context  
-- Create summaries based on document content  
-- Inspect retrieved sources and debug the pipeline  
-- Track token usage and estimated API costs  
-- Switch between local and API-based language models  
-
-The architecture is modular and extensible, following patterns used in modern AI systems.
+- Upload PDF and TXT documents
+- Build a searchable private knowledge base
+- Ask questions grounded in document context
+- Generate document summaries
+- Inspect retrieved sources used for answers
+- Compare different retrieval strategies
+- Monitor token usage, latency and estimated costs
+- Switch between local and cloud-based LLM providers
 
 ---
 
@@ -26,147 +30,265 @@ The architecture is modular and extensible, following patterns used in modern AI
 
 ![Main application view](assets/main_ui.jpg)
 
-### Cost tracking
+### Usage details
 
-![Cost](assets/cost_tracking.jpg)
-
-### Retrieval sources and scoring
-![Retrieval sources](assets/retrieval_sources.jpg)
+![Usage details](assets/usage_details.jpg)
 
 ---
 
-## Key Features
+# Key Features
 
-### Hybrid Retrieval
-- Dense search using FAISS embeddings  
-- Sparse search using TF-IDF  
-- Score fusion for improved relevance  
+## Document Processing
 
-### Query Processing
-- Basic query normalization  
-- Typo correction for improved robustness  
-
-### Reranking
-- Combines semantic similarity and keyword overlap  
-- Improves precision of top retrieved results  
-
-### Generation
-- Supports:
-  - OpenAI models (e.g. gpt-4.1-mini, gpt-4o-mini)
-  - Local models via Ollama  
-- Generates answers strictly based on retrieved context  
-
-### Cost and Token Tracking
-- Input and output token tracking  
-- Estimated cost per request  
-- Aggregated session usage  
-
-### Evaluation
-- Retrieval evaluation framework  
-- Metrics:
-  - Top-1 / Top-3 / Top-5 accuracy  
-  - Mean Reciprocal Rank (MRR)  
-  - Recall@k  
-- Comparison of retrieval modes:
-  - dense vs sparse vs hybrid  
-
-### User Interface
-- Streamlit-based interface  
-- Chat mode and summary mode  
-- Adjustable retrieval parameters  
-- Source inspection for each answer  
+- PDF and TXT ingestion
+- LangChain document loaders
+- Recursive text splitting
+- Metadata preservation
+- OCR fallback for scanned PDFs
 
 ---
 
-## Architecture
+## Hybrid Retrieval
 
-Pre-Retrieval  
-↓  
-Query Processing (normalization + typo correction)  
-↓  
-Hybrid Retrieval (FAISS + TF-IDF)  
-↓  
-Reranking and Filtering  
-↓  
-Context Construction  
-↓  
-Generation (LLM)  
-↓  
-Pipeline (chat / summary)  
+The retrieval system combines multiple search strategies:
 
----
+### Dense retrieval
+- FAISS vector search
+- Semantic similarity using embeddings
 
-## Project Structure
+### Sparse retrieval
+- TF-IDF keyword-based retrieval
 
-rag/  
-├── indexing/  
-├── retrieval/  
-├── pre_retrieval/  
-├── post_retrieval/  
-├── generation/  
-├── orchestration/  
-├── utils/  
-├── config.py  
-
-evaluation/  
-├── test_cases.py  
-├── evaluate.py  
-
-app.py  
+### Hybrid search
+- Weighted score fusion
+- Adjustable retrieval parameters
 
 ---
 
-## Running the Project
+## Reranking
 
-1. Install dependencies  
-pip install -r requirements.txt  
+Additional post-retrieval ranking layer:
 
-2. Configure environment  
-cp .env.example .env  
-
-Add your OpenAI API key:  
-OPENAI_API_KEY=your_key_here  
-
-3. (Optional) Run local models with Ollama  
-ollama pull llama3.1:8b  
-ollama pull nomic-embed-text  
-
-4. Build the knowledge base  
-python -m rag.indexing.builder  
-
-5. Run the application  
-streamlit run app.py  
+- Combines semantic relevance and keyword overlap
+- Improves ordering of retrieved chunks
+- Filters final context passed to the LLM
 
 ---
 
-## Retrieval evaluation
+## Generation
 
-python -m evaluation.evaluate
+Supports multiple LLM providers:
 
-The retrieval component was evaluated using standard information retrieval metrics.
+### Cloud
+- OpenAI models
+- Token and cost tracking
+
+### Local
+- Ollama integration
+- Open-source models support
+
+Generated responses are based on retrieved document context.
+
+---
+
+## Evaluation Framework
+
+Parrotly includes a dedicated retrieval evaluation pipeline.
+
+Supported metrics:
+
+- Top-K accuracy
+- Hit Rate
+- Mean Reciprocal Rank (MRR)
+- Recall@K
+- Retrieval latency
+
+The evaluation framework is used to compare different retrieval configurations:
+
+- Dense retrieval
+- Sparse retrieval
+- Hybrid retrieval
+- Different Top-K values
+- Different fusion weights
+
+Example results:
 
 | Mode   | Top-1 | Top-3 | Top-5 | MRR  | Recall@5 |
 |--------|------|------|------|------|----------|
-| Dense  | 0.90 | 0.90 | 1.00 | 0.92 | 1.00     |
-| Sparse | 0.80 | 0.90 | 1.00 | 0.85 | 1.00     |
-| Hybrid | 0.90 | 1.00 | 1.00 | 0.95 | 1.00     |
+| Dense  | 0.90 | 0.90 | 1.00 | 0.92 | 1.00 |
+| Sparse | 0.80 | 0.90 | 1.00 | 0.85 | 1.00 |
+| Hybrid | 0.90 | 1.00 | 1.00 | 0.95 | 1.00 |
 
-Hybrid retrieval achieves the best ranking performance (MRR),
-while all methods reach full recall at top-5.
-
----
-
-## Technology Stack
-
-Python  
-FAISS  
-Scikit-learn  
-OpenAI API  
-Ollama  
-Streamlit  
+Hybrid retrieval achieved the best ranking quality in the current evaluation dataset.
 
 ---
 
-## Author
+# Architecture
+
+```text
+Documents
+    |
+    v
+Document Processing
+(LangChain loaders + splitting + OCR)
+    |
+    v
+Embedding Generation
+    |
+    v
+Knowledge Index
+(FAISS + TF-IDF)
+    |
+    v
+Query Processing
+(normalization + correction)
+    |
+    v
+Hybrid Retrieval
+    |
+    v
+Reranking
+    |
+    v
+Context Builder
+    |
+    v
+LLM Generation
+(OpenAI / Ollama)
+    |
+    v
+Answer + Sources + Metrics
+```
+
+---
+
+# Project Structure
+
+```text
+rag/
+
+├── indexing/
+│   ├── loaders
+│   ├── chunking
+│   └── embeddings
+│
+├── retrieval/
+│   ├── dense retrieval
+│   ├── sparse retrieval
+│   └── hybrid search
+│
+├── pre_retrieval/
+│   └── query processing
+│
+├── post_retrieval/
+│   └── reranking
+│
+├── generation/
+│   └── LLM providers
+│
+├── orchestration/
+│   └── RAG pipeline
+
+evaluation/
+
+├── test_cases.py
+└── evaluate.py
+
+app.py
+```
+
+---
+
+# Running Locally
+
+## 1. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## 2. Configure environment
+
+Create `.env`:
+
+```env
+OPENAI_API_KEY=your_key_here
+
+LLM_PROVIDER=openai
+```
+
+For local models:
+
+```env
+LLM_PROVIDER=ollama
+
+OLLAMA_BASE_URL=http://localhost:11434
+```
+
+---
+
+## 3. Optional: install Ollama models
+
+```bash
+ollama pull llama3.1:8b
+
+ollama pull nomic-embed-text
+```
+
+---
+
+## 4. Build knowledge base
+
+```bash
+python -m rag.indexing.builder
+```
+
+---
+
+## 5. Start application
+
+```bash
+streamlit run app.py
+```
+
+---
+
+# Run Evaluation
+
+```bash
+python -m evaluation.evaluate
+```
+
+This runs retrieval experiments and compares available retrieval configurations.
+
+---
+
+# Technology Stack
+
+- Python
+- LangChain
+- FAISS
+- Scikit-learn
+- OpenAI API
+- Ollama
+- Streamlit
+- Pydantic
+- NumPy / Pandas
+
+---
+
+# Future Improvements
+
+- Persistent conversation history
+- Additional vector databases comparison
+- RAGAS / LLM-based answer evaluation
+- More advanced query transformations
+- Containerized deployment
+
+---
+
+# Author
 
 Bartłomiej Jamiołkowski

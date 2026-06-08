@@ -1,106 +1,65 @@
 """
-Text chunking module.
-
-Splits documents into clean paragraphs and fixed-size chunks
-for embedding and retrieval.
+Splits loaded documents into retrieval-ready chunks.
 """
 
-import re
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
-def split_into_paragraphs(text: str) -> list[str]:
-    """
-    Clean and split raw text into paragraphs.
-    """
-    text = text.replace("\r\n", "\n")
-
-    # Fix hyphenation from PDFs (e.g. "exam-\nple" -> "example")
-    text = re.sub(r"-\n", "", text)
-
-    # Join broken lines inside paragraphs
-    text = re.sub(r"(?<!\n)\n(?!\n)", " ", text)
-
-    # Normalize spacing
-    text = re.sub(r"\n{2,}", "\n\n", text)
-    text = re.sub(r"[ \t]+", " ", text)
-
-    paragraphs = [
-        p.strip()
-        for p in text.strip().split("\n\n")
-        if p.strip()
-    ]
-
-    return paragraphs
+DEFAULT_CHUNK_SIZE = 1000
+DEFAULT_CHUNK_OVERLAP = 200
 
 
-def chunk_paragraphs(
-    paragraphs: list[str],
-    max_words: int = 100,
-    overlap_words: int = 20,
-    max_chars: int = 1500,
-) -> list[str]:
-    """
-    Convert paragraphs into overlapping chunks.
-
-    Uses both word and character limits to avoid exceeding embedding model context.
-    """
-    chunks = []
-    current_chunk = []
-    current_len = 0
-
-    def flush_current():
-        if current_chunk:
-            text = " ".join(current_chunk).strip()
-            if text:
-                chunks.append(text[:max_chars])
-
-    for paragraph in paragraphs:
-        words = paragraph.split()
-        length = len(words)
-
-        if length > max_words:
-            start = 0
-            step = max_words - overlap_words
-
-            while start < length:
-                end = start + max_words
-                chunk = " ".join(words[start:end]).strip()
-                if chunk:
-                    chunks.append(chunk[:max_chars])
-                start += step
-
-            continue
-
-        candidate = " ".join(current_chunk + [paragraph]).strip()
-
-        if current_len + length <= max_words and len(candidate) <= max_chars:
-            current_chunk.append(paragraph)
-            current_len += length
-        else:
-            flush_current()
-            current_chunk = [paragraph]
-            current_len = length
-
-    flush_current()
-
-    return chunks
-
-
-def chunk_documents(documents: list[dict]) -> list[dict]:
+def chunk_documents(
+    documents: list[dict],
+    chunk_size: int = DEFAULT_CHUNK_SIZE,
+    chunk_overlap: int = DEFAULT_CHUNK_OVERLAP,
+) -> list[dict]:
     """
     Split documents into chunked units with metadata.
+
+    Keeps the project's internal chunk format compatible with
+    retrieval, reranking, logging and UI source display.
     """
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        separators=[
+            "\n\n",
+            "\n",
+            ". ",
+            " ",
+            "",
+        ],
+    )
+
     all_chunks = []
 
-    for doc in documents:
-        paragraphs = split_into_paragraphs(doc["text"])
-        chunks = chunk_paragraphs(paragraphs)
+    for document in documents:
+        text = document.get("text", "").strip()
+        if not text:
+            continue
 
-        for i, chunk in enumerate(chunks):
-            all_chunks.append({
-                "source": doc["source"],
-                "chunk_id": i,
-                "text": chunk,
-            })
+        source = document.get("source", "unknown")
+        metadata = document.get("metadata", {})
+
+        chunks = splitter.split_text(text)
+
+        for chunk_id, chunk_text in enumerate(chunks):
+            clean_text = chunk_text.strip()
+
+            if not clean_text:
+                continue
+
+            all_chunks.append(
+                {
+                    "source": source,
+                    "chunk_id": chunk_id,
+                    "text": clean_text,
+                    "metadata": {
+                        **metadata,
+                        "chunk_id": chunk_id,
+                    },
+                }
+            )
 
     return all_chunks

@@ -20,7 +20,11 @@ def build_faiss_index(embeddings: np.ndarray) -> faiss.IndexFlatIP:
     """
     Build a FAISS inner-product index from dense embeddings.
     """
+    if embeddings.size == 0:
+        raise ValueError("Cannot build FAISS index from empty embeddings.")
+
     dim = embeddings.shape[1]
+
     index = faiss.IndexFlatIP(dim)
     index.add(embeddings)
 
@@ -34,7 +38,13 @@ def rebuild_knowledge_base() -> None:
     STORAGE_DIR.mkdir(parents=True, exist_ok=True)
 
     documents = load_documents(DATA_DIR)
+    if not documents:
+        raise ValueError("No supported documents found in the data directory.")
+
     chunks = chunk_documents(documents)
+    if not chunks:
+        raise ValueError("No chunks were created from the loaded documents.")
+
     embeddings = build_embeddings(chunks)
     index = build_faiss_index(embeddings)
 
