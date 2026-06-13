@@ -42,11 +42,11 @@ Parrotly allows users to:
 ### Main application view
 
 <p align="center">
-  <img src="assets/main_view.png" width="850">
+  <img src="assets/main_view.jpg" width="850">
 </p>
 
 ### Query and source inspection
 
 <p align="center">
-  <img src="assets/usage_details.png" width="850">
+  <img src="assets/usage_details.jpg" width="850">
 </p>
