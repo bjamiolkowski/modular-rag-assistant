@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo.png" width="750">
+  <img src="assets/logo.png" width="850">
 </p>
 
 <p align="center">
@@ -49,4 +49,40 @@ Parrotly allows users to:
 
 <p align="center">
   <img src="assets/usage_details.jpg" width="850">
+</p>
+
+## Key Features
+
+### Document Processing
+
+- PDF and TXT document ingestion
+- Text chunking with metadata preservation
+- OCR support for scanned documents
+
+### Retrieval Pipeline
+
+- Dense retrieval using FAISS vector search and embeddings
+- Sparse keyword-based retrieval
+- Hybrid retrieval combining semantic and keyword search
+- Post-retrieval reranking to improve context quality
+
+### LLM Integration
+
+- Cloud-based models using OpenAI API
+- Local model support through Ollama
+- Context-grounded answer generation
+- Token usage and cost tracking
+
+### Evaluation & Monitoring
+
+- Retrieval quality evaluation using Top-K accuracy, MRR and Recall@K
+- Comparison of different retrieval configurations
+- Latency and usage monitoring
+
+## Architecture
+
+Parrotly uses a modular RAG architecture with separated document processing, retrieval, generation and evaluation components.
+
+<p align="center">
+  <img src="assets/architecture.png" width="850">
 </p>
