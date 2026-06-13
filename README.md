@@ -36,3 +36,17 @@ Parrotly allows users to:
 - Compare different retrieval configurations
 - Monitor token usage, latency and estimated costs
 - Switch between OpenAI and local models using Ollama
+
+## Demo
+
+### Main application view
+
+<p align="center">
+  <img src="assets/main_view.png" width="850">
+</p>
+
+### Query and source inspection
+
+<p align="center">
+  <img src="assets/usage_details.png" width="850">
+</p>
