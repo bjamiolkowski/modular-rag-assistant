@@ -10,5 +10,4 @@
   <img src="https://img.shields.io/badge/Ollama-Local_LLM-lightgrey">
   <img src="https://img.shields.io/badge/Streamlit-App-red">
   <img src="https://img.shields.io/badge/Docker-Containerized-blue">
-  <img src="https://img.shields.io/badge/License-MIT-green">
 </p>
