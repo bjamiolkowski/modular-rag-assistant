@@ -16,10 +16,7 @@ EMBED_MODEL = "nomic-embed-text"
 
 DEFAULT_PROVIDER = os.getenv("DEFAULT_PROVIDER", "ollama")
 
-OLLAMA_BASE_URL = os.getenv(
-    "OLLAMA_BASE_URL",
-    "http://192.168.0.199:11434",
-)
+OLLAMA_BASE_URL = "http://host.docker.internal:11434"
 
 OLLAMA_GEN_MODEL = "llama3.1:8b"
 OPENAI_GEN_MODEL = "gpt-4o-mini"

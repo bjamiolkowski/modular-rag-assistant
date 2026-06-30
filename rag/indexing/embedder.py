@@ -50,7 +50,11 @@ def build_embeddings(chunks: list[dict]) -> np.ndarray:
         return np.empty((0, 0), dtype="float32")
 
     embedding_model = _get_embedding_model()
-    vectors = embedding_model.embed_documents(texts)
+
+    vectors = []
+    for text in texts:
+        vector = embedding_model.embed_query(text)
+        vectors.append(vector)
 
     embeddings = np.array(vectors, dtype="float32")
     faiss.normalize_L2(embeddings)

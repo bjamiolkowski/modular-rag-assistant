@@ -163,23 +163,23 @@ def load_pipeline() -> ModularRAGPipeline | None:
 def save_uploaded_file() -> None:
     """Save uploaded file."""
     st.markdown(
-"""
-<div class="kb-card">
-<div class="kb-title">Knowledge base</div>
+        """
+        <div class="kb-card">
+        <div class="kb-title">Knowledge base</div>
 
-<div class="kb-dropbox">
-<div class="kb-icon">📄</div>
+        <div class="kb-dropbox">
+        <div class="kb-icon">📄</div>
 
-<div class="kb-main">
-Upload your <span>PDF, TXT</span> here
-</div>
+        <div class="kb-main">
+            Upload your <span>PDF, TXT</span> here
+        </div>
 
-<div class="kb-sub">
-Limit 200MB per file
-</div>
-</div>
-</div>
-""",
+        <div class="kb-sub">
+            Limit 200MB per file
+        </div>
+        </div>
+        </div>
+        """,
         unsafe_allow_html=True,
     )
 
@@ -200,10 +200,10 @@ Limit 200MB per file
 
     st.markdown(
         f"""
-<div class="kb-saved-file">
-Saved file: {uploaded_file.name}
-</div>
-""",
+        <div class="kb-saved-file">
+            Saved file: {uploaded_file.name}
+        </div>
+        """,
         unsafe_allow_html=True,
     )
 
@@ -222,6 +222,7 @@ def handle_rebuild() -> None:
             st.rerun()
         except Exception as exc:
             st.error(f"Error while updating knowledge base: {exc}")
+
 
 
 def render_sidebar() -> UIConfig:
